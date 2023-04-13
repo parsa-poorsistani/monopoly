@@ -15,13 +15,13 @@ class Player:
             self.money+=200
         #return self.location
     
-    def buy_property(self,property:Property):
+    def buy_property(self,property:Property) -> None:
         self.properties.append(property)
         
-    def remove_property(self,property:Property):
+    def remove_property(self,property:Property) -> None:
         self.properties.remove(property)
         
-    def pay(self,amount:int,receiver:Player):
+    def pay(self,amount:int,receiver:'Player') -> None:
         self.money-=amount
         receiver.money+=amount
     
