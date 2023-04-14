@@ -82,8 +82,23 @@ class Jail(Cell):
 
 
 # should get complete
-
-class Factory(Cell):
+class Vacation(Cell):
+    def __init__(self, name: str, location: int) -> None:
+        super().__init__(name, location)
+        
+    def landed_on(self,player:Player) -> None:
+        self.landed_palyers.append(player)
+        
+    def lands_off(self,player:Player) -> None:
+        self.landed_palyers.remove(player)
+        
+    def is_is_vacation(self,player:Player) -> bool:
+        if player in self.landed_palyers:
+            return True
+        return False
+    
+    
+class Company(Cell):
     def __init__(self, name: str, location: int,price:int) -> None:
         super().__init__(name, location)
         self.price = price
@@ -97,3 +112,4 @@ class AirPort(Cell):
         num_airports = sum([1 for prop in player.properties if isinstance(prop,AirPort)])
         rent = 25 * 2**(num_airports-1)
         return rent
+    
