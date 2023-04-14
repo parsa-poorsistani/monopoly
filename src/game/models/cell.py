@@ -1,5 +1,6 @@
 from abc import ABC
 from models.player import Player
+from enums.group_enums import GroupEnum
 
 class Cell(ABC):
     def __init__(self,name:str,location:int) -> None:
@@ -8,7 +9,7 @@ class Cell(ABC):
         self.landed_palyers:list = []
         
 class City(Cell):
-    def __init__(self, name: str, location: int, country:str, price:int, group:str) -> None:
+    def __init__(self, name: str, location: int, country:str, price:int, group:GroupEnum) -> None:
         super().__init__(name, location)
         self.country = country
         self.price = price
@@ -18,6 +19,12 @@ class City(Cell):
         self.num_houses = 0
         self.num_hotel = 0
         
+    def is_owned(self) -> bool:
+        return True if self.owner!=None else False
+    
+    def get_owner(self) -> Player:
+        return self.owner
+    
     def buy(self,buyer:Player)->None:
         self.owner = buyer
 
