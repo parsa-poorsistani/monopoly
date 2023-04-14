@@ -1,12 +1,13 @@
-from models.property import Property
+from models.cell import Cell
 
 class Player:
     
-    def __init__(self,name):
+    def __init__(self,name:str) -> None:
         self.name = name
         self.balance = 1500
         self.location = 0
-        self.properties = []
+        self.properties:list = []
+        is_bankrupted = False
         
     def move(self,num_spaces):
         self.location+=num_spaces
@@ -15,10 +16,10 @@ class Player:
             self.balance+=200
         #return self.location
     
-    def buy_property(self,property:Property) -> None:
+    def buy_property(self,property:Cell) -> None:
         self.properties.append(property)
         
-    def remove_property(self,property:Property) -> None:
+    def remove_property(self,property:Cell) -> None:
         self.properties.remove(property)
         
     def pay(self,amount:int,receiver:'Player') -> None:

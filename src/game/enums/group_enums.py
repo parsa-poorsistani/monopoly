@@ -1,4 +1,5 @@
-class GroupEnum:
+from enum import Enum
+class GroupEnum(Enum):
     BRAZIL = "Brazil"
     ITALY = "Italy"
     USA = "USA"
