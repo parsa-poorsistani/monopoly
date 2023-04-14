@@ -1,16 +1,22 @@
+from abc import ABC
 from models.player import Player
-from models.space import Space
-class Property(Space):
-    
-    def __init__(self,name: str, location: int,price:int,rent:int,group:str) -> None:
+
+class Cell(ABC):
+    def __init__(self,name:str,location:int) -> None:
+        self.name = name
+        self.location = location
+        self.landed_palyers:list = []
+        
+class City(Cell):
+    def __init__(self, name: str, location: int, country:str, price:int, group:str) -> None:
         super().__init__(name, location)
+        self.country = country
         self.price = price
-        self.remt = rent
         self.group = group
         self.owner:Player = None
+        self.rent = 0
         self.num_houses = 0
         self.num_hotel = 0
-        self.is_mortgaged = False
         
     def buy(self,buyer:Player)->None:
         self.owner = buyer
@@ -59,4 +65,35 @@ class Property(Space):
         self.owner = None
         self.num_houses = 0
         self.num_hotels = 0
-            
+        
+class Jail(Cell):
+    def __init__(self, name: str, location: int) -> None:
+        super().__init__(name, location)
+        
+    def landed_on(self,player:Player) -> None:
+        self.landed_palyers.append(player)
+    
+    def bail_out(self,player:Player) -> bool:
+        if player.balance>=50:
+            player.balance-=50
+            self.landed_palyers.remove(player)
+            return True
+        return False
+
+
+# should get complete
+
+class Factory(Cell):
+    def __init__(self, name: str, location: int,price:int) -> None:
+        super().__init__(name, location)
+        self.price = price
+        
+class AirPort(Cell):
+    def __init__(self, name: str, location: int, price:int) -> None:
+        super().__init__(name, location)
+        self.price = price
+    
+    def get_rent(self,player:Player) -> int:
+        num_airports = sum([1 for prop in player.properties if isinstance(prop,AirPort)])
+        rent = 25 * 2**(num_airports-1)
+        return rent
