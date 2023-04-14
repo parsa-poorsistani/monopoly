@@ -4,7 +4,7 @@ class Player:
     
     def __init__(self,name):
         self.name = name
-        self.money = 1500
+        self.balance = 1500
         self.location = 0
         self.properties = []
         
@@ -12,7 +12,7 @@ class Player:
         self.location+=num_spaces
         if self.location >=40:
             self.location -=40
-            self.money+=200
+            self.balance+=200
         #return self.location
     
     def buy_property(self,property:Property) -> None:
@@ -22,8 +22,8 @@ class Player:
         self.properties.remove(property)
         
     def pay(self,amount:int,receiver:'Player') -> None:
-        self.money-=amount
-        receiver.money+=amount
+        self.balance-=amount
+        receiver.balance+=amount
     
     
     
