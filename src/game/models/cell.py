@@ -1,20 +1,24 @@
 from abc import ABC
 from models.player import Player
 from enums.group_enums import GroupEnum
+from typing import Tuple
 
 class Cell(ABC):
-    def __init__(self,name:str,location:int) -> None:
+    def __init__(self,name:str,location:int,owner:Player=None) -> None:
         self.name = name
         self.location = location
+        self.owner = owner
         self.landed_palyers:list = []
         
-class City(Cell):
-    def __init__(self, name: str, location: int, country:str, price:int, group:GroupEnum) -> None:
+class EmptyCell(Cell):
+    def __init__(self, name: str, location: int) -> None:
         super().__init__(name, location)
-        self.country = country
+    
+class City(Cell):
+    def __init__(self, name: str, location: int, price:int, group:GroupEnum) -> None:
+        super().__init__(name, location)
         self.price = price
         self.group = group
-        self.owner:Player = None
         self.rent = 0
         self.num_houses = 0
         self.num_hotel = 0
@@ -109,14 +113,32 @@ class Company(Cell):
     def __init__(self, name: str, location: int,price:int) -> None:
         super().__init__(name, location)
         self.price = price
+    
+    def get_rent(self,dice_roll:Tuple[int,int]) -> int:
+        num_companies = sum([1 for prop in self.owner.properties if isinstance(prop,Company)])
+        if num_companies == 1:
+            return dice_roll[0]*4
+        elif num_companies==2:
+            return dice_roll[0]*10
+        return 0
         
-class AirPort(Cell):
+class Airport(Cell):
     def __init__(self, name: str, location: int, price:int) -> None:
         super().__init__(name, location)
         self.price = price
     
-    def get_rent(self,player:Player) -> int:
-        num_airports = sum([1 for prop in player.properties if isinstance(prop,AirPort)])
+    def get_rent(self) -> int:
+        num_airports = sum([1 for prop in self.owner.properties if isinstance(prop,Airport)])
         rent = 25 * 2**(num_airports-1)
         return rent
     
+
+class Tax(Cell):
+    def __init__(self, name: str, location: int) -> None:
+        super().__init__(name, location)
+
+    def calculate_tax(self,player:Player) -> None:
+        if self.name == "Income Tax":
+            player.balance -= (player.balance)*0.1
+        elif self.name == "Luxury Tax":
+            player.balance -= 75
