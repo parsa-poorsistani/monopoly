@@ -6,8 +6,8 @@ class Player:
         self.name = name
         self.balance = 1500
         self.location = 0
+        self.is_bankrupted = False
         self.properties:list = []
-        is_bankrupted = False
         
     def move(self,num_spaces):
         self.location+=num_spaces
@@ -25,6 +25,9 @@ class Player:
     def pay(self,amount:int,receiver:'Player') -> None:
         self.balance-=amount
         receiver.balance+=amount
+        
+    def bankrupted(self):
+        self.is_bankrupted = True
     
     
     

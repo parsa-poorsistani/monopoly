@@ -73,7 +73,11 @@ class Board:
         for i in range(31,20,-1):
             print("| "+self.print_cell_info(i)+" |",end="")
             
-        
+
+class Dialog:
+    @staticmethod
+    def print_():
+        pass
         
         
         
