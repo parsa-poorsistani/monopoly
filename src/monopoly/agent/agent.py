@@ -7,11 +7,11 @@ def min_node(main_player: Player, state: Game, depth: int) -> tuple:
     possible_actions = state.get_possible_actions()
     for action in possible_actions:
         # Take the action in a copy of the state
-        state.take_action(action)
+        new_state = state.take_action(action)
         # We should also switch the player
-        state.switch_player()
+        new_state.switch_player()
         # Recursively call expectiminimax on the new state with depth reduced by 1
-        eval, _ = expectiminimax(main_player, state, depth - 1, True)
+        eval, _ = expectiminimax(main_player, new_state, depth - 1, True)
         if eval < min_eval:
             min_eval = eval
             best_action = action
@@ -22,11 +22,11 @@ def max_node(main_player: Player, state: Game, depth: int) -> tuple:
     possible_actions = state.get_possible_actions()
     for action in possible_actions:
         # Take the action in a copy of the state
-        state.take_action(action)
+        new_state = state.take_action(action)
         # We should also switch the player
-        state.switch_player()
+        new_state.switch_player()
         # Recursively call expectiminimax on the new state with depth reduced by 1
-        eval, _ = expectiminimax(main_player,state, depth - 1, True)
+        eval, _ = expectiminimax(main_player,new_state, depth - 1, True)
         if eval > max_eval:
             max_eval = eval
             best_action = action

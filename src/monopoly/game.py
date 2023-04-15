@@ -2,22 +2,26 @@ from models.player import Player
 from actions import ACTIONS
 from board import Board
 from models.cell import *
+from copy import deepcopy
 
 # Define the Monopoly game class
 class Game:
-    def __init__(self,player1:Player,player2:Player) -> None:
+    def __init__(self,board:Board,players: list=[], current_player: int=0, other_player: int=1) -> None:
         # Initializing the game state
-        self.current_player = player1  # Index of the current player in the players list
-        self.other_player = player2
+        self.players = players  # List to represent the players
+        self.current_player = current_player  # Index of the current player in the players list
+        self.other_player = other_player
         self.game_over = False  # Boolean flag to indicate if the game is over
-        self.board:Board = Board()
+        self.board = board
 
 
     def take_action(self, action: int) -> None:
         # Updating the game state based on the action taken by the current player
 
-        curr_player = self.current_player
-        curr_position = self.current_player.location
+        new_players = deepcopy(self.players)
+        new_board = deepcopy(self.board)
+        curr_player:Player = new_players[self.current_player]
+        curr_position = curr_player.location
         curr_prop = self.board.locations[curr_position]
         # Do the appropriate changes for the action
         if action == 0:
@@ -28,16 +32,16 @@ class Game:
                 curr_prop.is_owned = True
         elif action == 2 and (isinstance(curr_prop,City) or isinstance(curr_prop,Company) or isinstance(curr_prop,Airport)) and curr_prop.is_owned:
             current_prop_owner:Player=None
-            for prop in self.other_player.properties:
+            for prop in self.players[self.other_player].properties:
                 if prop.name==curr_prop.name:
-                    current_prop_owner = self.other_player
+                    current_prop_owner = self.players[self.other_player]
             if current_prop_owner!=None:
                 if isinstance(curr_prop,City):
                     curr_player.pay(curr_prop.get_rent(),current_prop_owner)
                 elif isinstance(curr_prop,Company):
-                    curr_player.pay(curr_prop.get_rent(curr_player.last_roll,self.other_player.properties),current_prop_owner)
+                    curr_player.pay(curr_prop.get_rent(self.players[self.current_player].last_roll,self.players[self.other_player].properties),current_prop_owner)
                 elif isinstance(curr_prop,Airport):
-                    curr_player.pay(curr_prop.get_rent(self.other_player.properties),current_prop_owner)
+                    curr_player.pay(curr_prop.get_rent(self.players[self.other_player].properties),current_prop_owner)
             # if isinstance(curr_prop,City):
             #     elif isinstance(curr_prop,Company):
             #     curr_player.pay(curr_prop.get_rent,current_prop_owner)
@@ -61,11 +65,11 @@ class Game:
         elif action == 7:
             curr_player.is_in_jail = False
             curr_player.turns_in_jail = 0       
-        # return Game(new_board, new_players, self.current_player, self.game_over)
+        return Game(new_board, new_players, self.current_player, self.game_over)
     
     def get_possible_actions(self) -> list:
         # Get the possible actions available to the current player
-        curr_player = self.current_player
+        curr_player = self.players[self.current_player]
         curr_position = curr_player.location
         curr_prop = self.board.locations[curr_position]
         if curr_player.is_in_jail:
@@ -75,7 +79,7 @@ class Game:
                 return [6]
             return [5, 6]
         if isinstance(curr_prop,City) or isinstance(curr_prop,Airport) or isinstance(curr_prop,Company):
-            if curr_prop in self.current_player.properties:
+            if curr_prop in self.players[self.current_player].properties:
                 if curr_player.balance > curr_prop.price:
                     return [3, 0]
                 return [0]
@@ -91,24 +95,25 @@ class Game:
     
     def move_player(self, dice_result:int) -> None:
         # Pass if the player is in jail
-        if self.current_player.is_in_jail:
+        if self.players[self.current_player].is_in_jail:
             return
-        curr_player = self.current_player
+        curr_player = self.players[self.current_player]
         curr_position = curr_player.location
         # Update the player's position based on the dice roll result
-        curr_position = (curr_position + dice_result) % 40
-        curr_player.move(dice_result)
+        curr_position = (curr_position + dice_result) % len(self.board.locations)
+        curr_player.location = curr_position
 
     def is_terminal(self) -> bool:
         # Check if the game has reached a terminal state
-        if self.current_player.balance <= 0:
+        if self.players[self.current_player].balance <= 0:
             return True
         return False
     
     def evaluate_utility(self) -> int:
         # Evaluate the utility of the current game state for the current player
-        return self.current_player.net_worth()
+        return self.players[self.current_player].net_worth()
 
     def switch_player(self):
         # Switch to the next player's turn
-        self.current_player,self.other_player = self.other_player,self.current_player
+        self.current_player += 1
+        self.current_player %= 2

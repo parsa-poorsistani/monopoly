@@ -2,12 +2,13 @@ from game import Game
 from agent.agent import expectiminimax
 from actions import ACTIONS
 from models.player import Player
+from board import Board
 
 def play(state: Game) -> None:
         num_of_rounds = 0
         while not state.game_over:
             # Get current player from state
-            curr_player = state.current_player
+            curr_player = state.players[state.current_player]
             print(f"{curr_player.name} is on {curr_player.location} and has {curr_player.balance}$,")
             
             if curr_player.is_in_jail:
@@ -21,7 +22,7 @@ def play(state: Game) -> None:
             # Determining the best possible action
             _, best_action = expectiminimax(state.current_player, state)
             
-            state.take_action(best_action)
+            state = state.take_action(best_action)
             print(f"{curr_player.name} {ACTIONS[best_action]}.")
             print(state.current_player)
             print(f"Current net worth: {state.evaluate_utility()}")
@@ -39,5 +40,6 @@ def play(state: Game) -> None:
 if __name__ == "__main__":
     p1 = Player("P1")
     p2 = Player("P2")
-    game = Game(p1,p2)
+    board = Board()
+    game = Game(board,[p1,p2])
     play(game)

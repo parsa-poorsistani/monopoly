@@ -15,12 +15,12 @@ class Player:
         self.rolled_double = False
         self.properties:list = []
         
-    def move(self,num_spaces:int) -> None:
-        self.location+=num_spaces
-        if self.location >40:
-            self.location -=39
-            self.balance+=200
-        #return self.location
+    # def move(self,num_spaces:int) -> None:
+    #     self.location+=num_spaces
+    #     if self.location >40:
+    #         self.location -=39
+    #         self.balance+=200
+    #     #return self.location
     
     def net_worth(self) -> int:
         worth = 0
